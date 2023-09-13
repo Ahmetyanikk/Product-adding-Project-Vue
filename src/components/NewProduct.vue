@@ -28,6 +28,8 @@
                         </div>
                     </div>
                     <button @click="addProduct" class="btn btn-outline-info btn-block">Ekle!</button>
+                    <button @click="addProductApi" class="btn btn-outline-info btn-block">Api'dan Ekle!</button>
+
                 </div>
             </div>
         </div>
@@ -36,7 +38,9 @@
 
 <script>
     import {eventBus} from "../main";
+    import axios from "axios";
 
+    
     export default {
         data() {
             return {
@@ -64,6 +68,33 @@
                     totalPrice: null,
                     selectedImage: null
                 }
+           
+            },
+            addProductApi(){
+                axios
+                    .get('http://localhost:3000') // Update the URL with your API endpoint
+                     .then((response) => {
+                        console.log(response.data);
+                    
+                        this.product.title= response.data.title;
+                        this.product.count= response.data.count;
+                        this.product.price= response.data.price;
+                        this.product.selectedImage= response.data.selectedImage;
+                        
+                        this.product.totalPrice = this.product.count * this.product.price;
+                        console.log(this.product)
+                        eventBus.$emit("productAdded", this.product);
+                        this.product = {
+                        title: null,
+                        count: null,
+                        price: null,
+                        totalPrice: null,
+                        selectedImage: null
+                        }
+                     })
+                 .catch((error) => {
+                     console.error(error);
+                 });
             }
         }
     }
